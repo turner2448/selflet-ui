@@ -57,7 +57,6 @@ class Admin extends React.Component {
     } else {
       this.setState({ keycloak: keycloak, authenticated: true });
       this.state.username = keycloak.idTokenParsed.preferred_username;
-      //alert(this.state.username);
       localStorage.setItem("react-token", keycloak.token);
       localStorage.setItem("react-refresh-token", keycloak.refreshToken);
       let tokenString = JSON.stringify(keycloak.tokenParsed);

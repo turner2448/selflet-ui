@@ -16,6 +16,7 @@
 
 */
 import CreateUser from "views/examples/CreateUser.jsx";
+import ListUser from "views/examples/ListUser.jsx";
 
 var routes = [
   {
@@ -23,6 +24,13 @@ var routes = [
     name: "Dashboard",
     icon: "ni ni-tv-2 text-primary",
     component: CreateUser,
+    layout: "/admin"
+  },
+  {
+    path: "/people/listuser",
+    name: "Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: ListUser,
     layout: "/admin"
   }
 ];
