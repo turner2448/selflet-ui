@@ -17,13 +17,17 @@
 */
 import React from "react";
 import { Route, Switch } from "react-router-dom";
+
+import { connect } from 'react-redux';
+import {login} from "actions/authAction";
+
 // reactstrap components
 import { Container } from "reactstrap";
 // core components
-import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
 import AdminFooter from "components/Footers/AdminFooter.jsx";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 import Keycloak from 'keycloak-js';
+import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
 
 
 import routes from "routes.js";
@@ -32,16 +36,12 @@ class Admin extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { keycloak: null, authenticated: false };
-    this.state.username = null;
   }
-
-
 
   componentDidUpdate() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
-    this.refs.mainContent.scrollTop = 0;
+    //this.refs.mainContent.scrollTop = 0;
   }
 
   componentDidMount() {
@@ -52,11 +52,9 @@ class Admin extends React.Component {
       let keycloak = Keycloak(initOptions);
   
     keycloak.init({ onLoad: initOptions.onLoad }).success((auth) => {
-  
     if (!auth) {
     } else {
-      this.setState({ keycloak: keycloak, authenticated: true });
-      this.state.username = keycloak.idTokenParsed.preferred_username;
+      this.props.login({ authenticated: true, username: keycloak.idTokenParsed.preferred_username, keycloak: keycloak});
       localStorage.setItem("react-token", keycloak.token);
       localStorage.setItem("react-refresh-token", keycloak.refreshToken);
       let tokenString = JSON.stringify(keycloak.tokenParsed);
@@ -92,33 +90,58 @@ class Admin extends React.Component {
     }
     return "Brand";
   };
+
   render() {
-   if (this.state.authenticated) {
-    return (
-      <>
-        <Sidebar
-          {...this.props}
-          routes={routes}
-          logo={{
-            innerLink: "/admin/index",
-            imgSrc: require("assets/img/brand/argon-react.png"),
-            imgAlt: "..."
-          }}
-        />
-        
-          <div className="main-content" ref="mainContent">
-        
-          <Switch>{this.getRoutes(routes)}</Switch>
-          <Container fluid>
-            <AdminFooter />
-          </Container>  
-        </div>
-      </>
-    
-    );
+   if (this.props.authenticated) {
+    if (this.props.keycloak.idTokenParsed.agency == 'true') {
+      return (
+        <>
+          <Sidebar
+            {...this.props}
+            routes={routes}
+            logo={{
+              innerLink: "/admin/index",
+              imgSrc: require("assets/img/brand/argon-react.png"),
+              imgAlt: "..."
+            }}
+          />
+          
+            <div className="main-content" ref="mainContent">
+            
+              <AdminNavbar
+                {...this.props}
+                brandText={this.getBrandText(this.props.location.pathname)}
+              />
+            <Switch>{this.getRoutes(routes)}</Switch>
+            <Container fluid>
+              <AdminFooter />
+            </Container>  
+          </div>
+        </>
+      );
+    } else {
+      return "Not an agency user";
+    }
   }
-  return "tony";
+  return "login failure";
 }
 }
 
-export default Admin;
+const mapStateToProps = state => {
+  return {
+    authenticated: state.authReducer.authenticated,
+    username: state.authReducer.username,
+    keycloak: state.authReducer.keycloak
+  };
+};
+
+function mapDispatchToProps(dispatch){
+  return {
+    login: payload => {
+      dispatch(login(payload))
+  }
+}
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps) (Admin)

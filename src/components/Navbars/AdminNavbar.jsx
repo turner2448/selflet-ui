@@ -36,6 +36,16 @@ import {
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
+
+  logout(e, kc) {
+    e.preventDefault();
+    
+    let initOptions = {
+      'url': 'http://localhost:8080/auth', 'redirectUri': 'http://localhost:3000'
+      }
+    kc.logout(initOptions);
+  }
+
   render() {
     return (
       <>
@@ -45,7 +55,7 @@ class AdminNavbar extends React.Component {
               className="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
               to="/"
             >
-              {this.props.brandText}
+              {this.props.brandText} 
             </Link>
             <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
               <FormGroup className="mb-0">
@@ -97,7 +107,7 @@ class AdminNavbar extends React.Component {
                     <span>Support</span>
                   </DropdownItem>
                   <DropdownItem divider />
-                  <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
+                  <DropdownItem href="#pablo" onClick={e => this.logout(e, this.props.keycloak)}>
                     <i className="ni ni-user-run" />
                     <span>Logout</span>
                   </DropdownItem>
@@ -110,5 +120,15 @@ class AdminNavbar extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    authenticated: state.authReducer.authenticated,
+    username: state.authReducer.username,
+    keycloak: state.authReducer.keycloak,
+    test: state.authReducer.test
+  };
+};
+
 
 export default AdminNavbar;
