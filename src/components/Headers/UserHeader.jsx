@@ -40,17 +40,16 @@ class UserHeader extends React.Component {
           <Container className="d-flex align-items-center" fluid>
             <Row>
               <Col lg="7" md="10">
-                <h1 className="display-2 text-white">Hello Jesse</h1>
+                <h1 className="display-2 text-white">Hello {this.props.keycloak.idTokenParsed.name}</h1>
                 <p className="text-white mt-0 mb-5">
-                  This is your profile page. You can see the progress you've
-                  made with your work and manage your projects or assigned tasks
+                  This is your profile page. 
                 </p>
                 <Button
                   color="info"
                   href="#pablo"
                   onClick={e => e.preventDefault()}
                 >
-                  Edit profile
+                  Back
                 </Button>
               </Col>
             </Row>

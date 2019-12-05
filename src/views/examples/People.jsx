@@ -51,7 +51,7 @@ import { Route, Switch } from "react-router-dom";
 import routes from "routes/people/routes.js";
 
 // core components
-import Header from "components/Headers/Header.jsx";
+import Header2 from "components/Headers/Header2.jsx";
 
 class People extends React.Component {
 
@@ -81,6 +81,7 @@ class People extends React.Component {
   render() {
     return (
       <>
+      <Header2 />
  <Navbar bg="light" expand="lg">
   <Navbar.Brand href="#home"></Navbar.Brand>
   <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -96,7 +97,6 @@ class People extends React.Component {
         <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
       </NavDropdown>
     </Nav>
-    <div>welcome user</div>
 
   </Navbar.Collapse>
 </Navbar>

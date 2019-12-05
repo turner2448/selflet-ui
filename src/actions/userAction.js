@@ -1,6 +1,6 @@
-export function createUser(payload) {
+export function listUsers(payload) {
     return {
-      type: "CREATE_USER",
+      type: "LIST_USERS",
       payload
     };
   }

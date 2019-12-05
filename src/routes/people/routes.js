@@ -32,6 +32,13 @@ var routes = [
     icon: "ni ni-tv-2 text-primary",
     component: ListUser,
     layout: "/admin"
+  },
+  {
+    path: "/people",
+    name: "Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: ListUser,
+    layout: "/admin"
   }
 ];
 export default routes;

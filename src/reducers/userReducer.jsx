@@ -1,24 +1,13 @@
 const initialState = { 
-    username: "",
-    firstname: "",
-    lastName: "",
-    attributes: {
-        agency: true,
-        landlord: false,
-        tenant: false
-    }
-
+    users: [],
 }; 
 
 function userReducer(state = initialState, action) {
     switch (action.type) {
-        case 'CREATE_USER':
+        case 'LIST_USERS':
             return {
                 ...state,
-                username: action.payload.username,
-                firstName: action.payload.firstName,
-                lastName: action.payload.lastName,
-                agency: action.payload.attributes.agency
+                users: action.payload.users
             };
         default:
          return state

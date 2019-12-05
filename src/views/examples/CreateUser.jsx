@@ -2,6 +2,7 @@ import React from "react";
 
 import { connect } from 'react-redux';
 import {createUser} from "actions/userAction";
+import { Redirect } from 'react-router-dom'
 
 // reactstrap components
 import {
@@ -32,6 +33,7 @@ import {
 } from "reactstrap";
 
 import {Navbar, Nav, NavDropdown, Form, FormControl} from 'react-bootstrap'
+import Dialog from 'react-bootstrap-dialog'
 
 class CreateUser extends React.Component {
 
@@ -40,7 +42,7 @@ class CreateUser extends React.Component {
 
     this.state = { 
       username: "",
-      firstname: "",
+      firstName: "",
       lastName: "",
       agency: true,
       landlord: false,
@@ -52,6 +54,42 @@ class CreateUser extends React.Component {
     this.handleUsername.bind(this);
     this.handleFirstName.bind(this);
     this.handleLastName.bind(this);
+    this.onAddUser = this.onAddUser.bind(this)
+  }
+
+  onAddUser() {
+    //this.dialog.showAlert('User added')
+    this.dialog.show({
+      title: 'User operation',
+      body: 'User added',
+      actions: [
+        Dialog.CancelAction(),
+        Dialog.OKAction(() => {
+        })
+      ],
+      bsSize: 'small',
+      onHide: (dialog) => {
+        dialog.hide()
+        console.log('closed by clicking background.')
+      }
+    })
+  }
+
+  onAddUserFail(message) {
+    //this.dialog.showAlert('User added')
+    this.dialog.show({
+      title: 'User operation',
+      body: message,
+      actions: [
+        Dialog.OKAction(() => {
+        })
+      ],
+      bsSize: 'small',
+      onHide: (dialog) => {
+        dialog.hide()
+        console.log('closed by clicking background.')
+      }
+    })
   }
 
   addUser(e) {
@@ -64,16 +102,21 @@ class CreateUser extends React.Component {
     req.setRequestHeader('Accept', 'application/json');
     req.setRequestHeader('Content-type', 'application/json');
     req.setRequestHeader('Access-Control-Allow-Origin', true)
-    //req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem("react-token"));
-
-    req.onreadystatechange = function () {
-      if (req.readyState == 4) {
-          if (req.status == 200) {
-              //alert(req.);
-          } else if (req.status == 403) {
-              alert('Forbidden');
-          }
+ 
+   req.onreadystatechange = () => {
+    if (req.readyState == 4) {
+      if (req.status == 200) {
+        this.setState({firstName: ""});
+        this.setState({username: ""});
+        this.setState({lastName: ""});
+        this.onAddUser();
+        //this.props.history.push('/admin/index')
+      } else if (req.status == 403) {
+          this.onAddUserFail("Unauthorised");
+      } else if (req.status == 409) {
+          this.onAddUserFail("Username exists");
       }
+  }
   }
   
   //build json payload
@@ -86,6 +129,7 @@ class CreateUser extends React.Component {
   payload.agency = this.state.agency;
   payload.landlord = this.state.landlord;
   payload.tenant = this.state.tenant;
+  payload.agencyId = this.props.keycloak.idTokenParsed.agencyId;
 
   req.send(JSON.stringify(payload));
   }
@@ -118,6 +162,8 @@ render() {
     return (
       <>
 
+<Dialog ref={(component) => { this.dialog = component }} />
+
 <Container style={{marginTop: 2 + "em"}} fluid>
           <Row>
             <Col className="mb-5 mb-xl-0" xl="8">
@@ -125,17 +171,17 @@ render() {
             <Form onSubmit={e => this.addUser(e)}>
   <Form.Group controlId="formBasicEmail">
     <Form.Label>Email address</Form.Label>
-    <Form.Control type="email" ref="email" placeholder="Enter email" name="email" onChange={this.handleUsername} required/>
+    <Form.Control type="email" ref="username" placeholder="Enter email" name="username" value={this.state.username} onChange={this.handleUsername} required/>
   </Form.Group>
 
   <Form.Group controlId="formBasicFirstName">
     <Form.Label>First Name</Form.Label>
-    <Form.Control type="text" ref="firstName" name="firstName" onChange={this.handleFirstName} required />
+    <Form.Control type="text" ref="firstName" name="firstName" onChange={this.handleFirstName} value={this.state.firstName} required />
   </Form.Group>
 
   <Form.Group controlId="formBasicLastName">
     <Form.Label>Last Name</Form.Label>
-    <Form.Control type="text" ref="lastName" name="lastName" onChange={this.handleLastName} required />
+    <Form.Control type="text" ref="lastName" name="lastName" onChange={this.handleLastName} value={this.state.lastName} required />
   </Form.Group>
 {/*
   <Form.Group controlId="formBasicPassword">
@@ -167,5 +213,13 @@ render() {
 }
 }
 
+const mapStateToProps = state => {
+  return {
+    authenticated: state.authReducer.authenticated,
+    username: state.authReducer.username,
+    keycloak: state.authReducer.keycloak
+  };
+};
 
-export default CreateUser
+
+export default connect(mapStateToProps) (CreateUser)
